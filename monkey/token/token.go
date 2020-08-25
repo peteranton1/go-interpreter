@@ -6,9 +6,9 @@ type TokenType string
 
 // Token struct
 type Token struct {
-	Type           TokenType
-	Literal        string
-	SourcePosition int
+	Type    TokenType
+	Literal string
+	Col     int
 }
 
 const (
@@ -26,7 +26,15 @@ const (
 	ASSIGN = "="
 	// PLUS Operator
 	PLUS = "+"
+	// MINUS Operator
+	MINUS = "-"
+	// SLASH Operator
+	SLASH = "/"
+	// ASTERISK Operator
+	ASTERISK = "*"
 
+	// BANG Delimiters
+	BANG = "!"
 	// COMMA Delimiters
 	COMMA = ","
 	// SEMICOLON Delimiter
@@ -39,16 +47,39 @@ const (
 	LBRACE = "{"
 	// RBRACE Delimiter
 	RBRACE = "}"
+	// LT Delimiter
+	LT = "<"
+	// GT Delimiter
+	GT = ">"
+	// EQ Delimiter
+	EQ = "=="
+	// NOT_EQ Delimiter
+	NOT_EQ = "!="
 
-	// FUNCTION Keywords
+	// FUNCTION Keyword
 	FUNCTION = "FUNCTION"
-	// LET Keywords
+	// LET Keyword
 	LET = "LET"
+	// IF Keyword
+	IF = "IF"
+	// ELSE Keyword
+	ELSE = "ELSE"
+	// RETURN Keyword
+	RETURN = "RETURN"
+	// TRUE Keyword
+	TRUE = "TRUE"
+	// FALSE Keyword
+	FALSE = "FALSE"
 )
 
 var keywords = map[string]TokenType{
-	"fn":  FUNCTION,
-	"let": LET,
+	"fn":     FUNCTION,
+	"let":    LET,
+	"if":     IF,
+	"else":   ELSE,
+	"return": RETURN,
+	"true":   TRUE,
+	"false":  FALSE,
 }
 
 // LookupIdent returns Ident or Keyword
