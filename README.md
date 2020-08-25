@@ -19,3 +19,37 @@ through the act of implementation.
 
 This was also a non-trivial implementation for practice 
 in the Go language. 
+
+## How to compile and run
+
+### Run Tests
+
+The Tests are run like any go program. 
+
+From the folder containing a (file).go and (file)_test.go, issue 
+
+    go test (file).go
+    e.g.
+    go test lexer.go
+    go test parser.go
+
+### Run REPL
+
+The REPL is a command line program that presents the interactive interpreter. 
+
+From the folder containing main.go
+
+    go run main.go
+
+This command compiles and runs the main program, which starts an interactive shell, 
+known as the REPL. This accepts statements in the Monkey language and evaluates 
+each line and prints the output to the screen. 
+
+Here are some example statements in Monkey:
+
+    let five = 5;
+	let ten = 10;
+	let add = fn(x, y) {
+		x + y;
+	};
+	let result = add(five,ten);
