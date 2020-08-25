@@ -1,4 +1,4 @@
-# Writing and Interpreter in Go
+# Writing an Interpreter in Go
 
 This project contains example code
 for an implementation of an interpreter 

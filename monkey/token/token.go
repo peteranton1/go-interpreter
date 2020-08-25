@@ -1,35 +1,60 @@
-// token/token.go
+// Package token token/token.go
 package token
 
+// TokenType type
 type TokenType string
 
+// Token struct
 type Token struct {
-	Type    TokenType
-	Literal string
+	Type           TokenType
+	Literal        string
+	SourcePosition int
 }
 
 const (
-	// Control chars
+	// ILLEGAL Control chars
 	ILLEGAL = "ILLEGAL"
-	EOF     = "EOF"
+	// EOF Control chars
+	EOF = "EOF"
 
-	// Identifiers + Literals
+	// IDENT Identifiers + Literals
 	IDENT = "IDENT"
-	INT   = "INT"
+	// INT Integer
+	INT = "INT"
 
-	// Operators
+	// ASSIGN Operators
 	ASSIGN = "="
-	PLUS   = "+"
+	// PLUS Operator
+	PLUS = "+"
 
-	// Delimiters
-	COMMA     = ","
+	// COMMA Delimiters
+	COMMA = ","
+	// SEMICOLON Delimiter
 	SEMICOLON = ";"
-	LPAREN    = "("
-	RPAREN    = ")"
-	LBRACE    = "{"
-	RBRACE    = "}"
+	// LPAREN Delimiter
+	LPAREN = "("
+	// RPAREN Delimiter
+	RPAREN = ")"
+	// LBRACE Delimiter
+	LBRACE = "{"
+	// RBRACE Delimiter
+	RBRACE = "}"
 
-	// Keywords
+	// FUNCTION Keywords
 	FUNCTION = "FUNCTION"
-	LET      = "LET"
+	// LET Keywords
+	LET = "LET"
 )
+
+var keywords = map[string]TokenType{
+	"fn":  FUNCTION,
+	"let": LET,
+}
+
+// LookupIdent returns Ident or Keyword
+func LookupIdent(ident string) TokenType {
+	if tok, ok := keywords[ident]; ok {
+		return tok
+	}
+	return IDENT
+}
