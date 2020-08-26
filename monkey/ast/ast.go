@@ -2,12 +2,14 @@
 package ast
 
 import (
+	"bytes"
 	"monkey/token"
 )
 
 // Node base type
 type Node interface {
 	TokenLiteral() string
+	String() string
 }
 
 // Statement subtype
@@ -36,6 +38,15 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
+// String interface method
+func (p *Program) String() string {
+	var out bytes.Buffer
+	for _, s := range p.Statements {
+		out.WriteString(s.String())
+	}
+	return out.String()
+}
+
 // LetStatement struct
 type LetStatement struct {
 	Token token.Token
@@ -51,18 +62,18 @@ func (ls *LetStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }
 
-// Identifier struct
-type Identifier struct {
-	Token token.Token
-	Value string
-}
+// String interface method
+func (ls *LetStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(ls.TokenLiteral() + " ")
+	out.WriteString(ls.Name.String())
+	out.WriteString(" = ")
 
-// statementNode interface method
-func (i *Identifier) expressionNode() {}
-
-// TokenLiteral interface method
-func (i *Identifier) TokenLiteral() string {
-	return i.Token.Literal
+	if ls.Value != nil {
+		out.WriteString(ls.Value.String())
+	}
+	out.WriteString(";")
+	return out.String()
 }
 
 // ReturnStatement struct
@@ -76,4 +87,75 @@ func (rs *ReturnStatement) statementNode() {}
 // TokenLiteral interface method
 func (rs *ReturnStatement) TokenLiteral() string {
 	return rs.Token.Literal
+}
+
+// String interface method
+func (rs *ReturnStatement) String() string {
+	var out bytes.Buffer
+	out.WriteString(rs.TokenLiteral() + " ")
+
+	if rs.ReturnValue != nil {
+		out.WriteString(rs.ReturnValue.String())
+	}
+	out.WriteString(";")
+	return out.String()
+}
+
+// ExpressionStatement struct
+type ExpressionStatement struct {
+	Token      token.Token
+	Expression Expression
+}
+
+func (es *ExpressionStatement) statementNode() {}
+
+// TokenLiteral interface method
+func (es *ExpressionStatement) TokenLiteral() string {
+	return es.Token.Literal
+}
+
+// String interface method
+func (es *ExpressionStatement) String() string {
+	if es.Expression != nil {
+		return es.Expression.String()
+	}
+	return ""
+}
+
+// Identifier struct
+type Identifier struct {
+	Token token.Token
+	Value string
+}
+
+// expressionNode interface method
+func (i *Identifier) expressionNode() {}
+
+// TokenLiteral interface method
+func (i *Identifier) TokenLiteral() string {
+	return i.Token.Literal
+}
+
+// String interface method
+func (i *Identifier) String() string {
+	return i.Value
+}
+
+// IntegerLiteral struct
+type IntegerLiteral struct {
+	Token token.Token
+	Value int64
+}
+
+// expressionNode interface method
+func (il *IntegerLiteral) expressionNode() {}
+
+// TokenLiteral interface method
+func (il *IntegerLiteral) TokenLiteral() string {
+	return il.Token.Literal
+}
+
+// String interface method
+func (il *IntegerLiteral) String() string {
+	return il.Token.Literal
 }
