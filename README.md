@@ -1,6 +1,10 @@
 ---
 # Writing an Interpreter in Go
 ---
+# README
+
+(view [CHANGELOG](./CHANGELOG.md) for notable changes)
+
 
 This project contains example code
 for an implementation of an interpreter 
@@ -58,11 +62,10 @@ Here are some example statements in Monkey:
 
 # Ideas for improvements
 
-* Add more functionality to the monkey language
+* Add more documentation and functionality to the monkey language
 * Provide more example programs
 * Additional run modes apart from REPL
 * Implement a module system
-* Better documentation
 * Implementations in languages other than Go
 
 # Credits
