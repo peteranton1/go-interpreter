@@ -177,10 +177,35 @@ func (pe *PrefixExpression) TokenLiteral() string {
 // String interface method
 func (pe *PrefixExpression) String() string {
 	var out bytes.Buffer
-	out.WriteString("!")
 	out.WriteString("(")
 	out.WriteString(pe.Operator)
 	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+	return out.String()
+}
+
+// InfixExpression struct
+type InfixExpression struct {
+	Token    token.Token
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+func (ie *InfixExpression) expressionNode() {}
+
+// TokenLiteral interface method
+func (ie *InfixExpression) TokenLiteral() string {
+	return ie.Token.Literal
+}
+
+// String interface method
+func (ie *InfixExpression) String() string {
+	var out bytes.Buffer
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString(" " + ie.Operator + " ")
+	out.WriteString(ie.Right.String())
 	out.WriteString(")")
 	return out.String()
 }

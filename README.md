@@ -1,4 +1,6 @@
+---
 # Writing an Interpreter in Go
+---
 
 This project contains example code
 for an implementation of an interpreter 
@@ -53,3 +55,18 @@ Here are some example statements in Monkey:
 		x + y;
 	};
 	let result = add(five,ten);
+
+# Ideas for improvements
+
+* Add more functionality to the monkey language
+* Provide more example programs
+* Additional run modes apart from REPL
+* Implement a module system
+* Better documentation
+* Implementations in languages other than Go
+
+# Credits
+
+This implementation was largely based on the excellent book called
+    "Writing an Interpreter in Go" by Thorsten Ball
+
