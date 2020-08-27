@@ -33,9 +33,8 @@ type Program struct {
 func (p *Program) TokenLiteral() string {
 	if len(p.Statements) > 0 {
 		return p.Statements[0].TokenLiteral()
-	} else {
-		return ""
 	}
+	return ""
 }
 
 // String interface method
@@ -208,4 +207,22 @@ func (ie *InfixExpression) String() string {
 	out.WriteString(ie.Right.String())
 	out.WriteString(")")
 	return out.String()
+}
+
+// Boolean struct
+type Boolean struct {
+	Token token.Token
+	Value bool
+}
+
+func (b *Boolean) expressionNode() {}
+
+// TokenLiteral interface method
+func (b *Boolean) TokenLiteral() string {
+	return b.Token.Literal
+}
+
+// String interface method
+func (b *Boolean) String() string {
+	return b.Token.Literal
 }
