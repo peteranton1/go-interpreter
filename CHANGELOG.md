@@ -16,7 +16,8 @@ Here we write upgrading notes from previous versions.
  
 ### Added
 * Added Lexer for Monkey
-* Added Parser initial implementation
+* Added Parser for Monkey
+* Added Eval initial implementation
 
 ### Changed
  
