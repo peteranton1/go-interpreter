@@ -15,8 +15,10 @@ const (
 	BOOLEAN_OBJ = "BOOLEAN"
 	// NULL_OBJ const
 	NULL_OBJ = "NULL"
-	// RETURN_OBJ const
+	// RETURN_VALUE_OBJ const
 	RETURN_VALUE_OBJ = "RETURN_VALUE_OBJ"
+	// ERROR_OBJ const
+	ERROR_OBJ = "ERROR_OBJ"
 )
 
 // Object interface
@@ -81,4 +83,19 @@ func (rv *ReturnValue) Type() ObjectType {
 // Inspect interface method
 func (rv *ReturnValue) Inspect() string {
 	return rv.Value.Inspect()
+}
+
+// Error struct
+type Error struct {
+	Message string
+}
+
+// Type interface method
+func (e *Error) Type() ObjectType {
+	return ERROR_OBJ
+}
+
+// Inspect interface method
+func (e *Error) Inspect() string {
+	return "ERROR: " + e.Message
 }
