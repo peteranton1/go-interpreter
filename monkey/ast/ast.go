@@ -160,6 +160,25 @@ func (il *IntegerLiteral) String() string {
 	return il.Token.Literal
 }
 
+// StringLiteral struct
+type StringLiteral struct {
+	Token token.Token
+	Value string
+}
+
+// expressionNode interface method
+func (sl *StringLiteral) expressionNode() {}
+
+// TokenLiteral interface method
+func (sl *StringLiteral) TokenLiteral() string {
+	return sl.Token.Literal
+}
+
+// String interface method
+func (sl *StringLiteral) String() string {
+	return sl.Token.Literal
+}
+
 // PrefixExpression struct
 type PrefixExpression struct {
 	Token    token.Token

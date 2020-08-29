@@ -17,10 +17,12 @@ const (
 	// EOF Control chars
 	EOF = "EOF"
 
-	// IDENT Identifiers + Literals
+	// IDENT Identifiers
 	IDENT = "IDENT"
-	// INT Integer
+	// INT datatype
 	INT = "INT"
+	// STRING datatype
+	STRING = "STRING"
 
 	// ASSIGN Operators
 	ASSIGN = "="

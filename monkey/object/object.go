@@ -24,6 +24,8 @@ const (
 	ERROR_OBJ = "ERROR_OBJ"
 	// FUNCTION_OBJ const
 	FUNCTION_OBJ = "FUNCTION_OBJ"
+	// STRING_OBJ const
+	STRING = "STRING"
 )
 
 // Object interface
@@ -133,4 +135,19 @@ func (f *Function) Inspect() string {
 	out.WriteString(f.Body.String())
 	out.WriteString("\n}")
 	return out.String()
+}
+
+// String struct
+type String struct {
+	Value string
+}
+
+// Type interface method
+func (s *String) Type() ObjectType {
+	return STRING
+}
+
+// Inspect interface method
+func (s *String) Inspect() string {
+	return s.Value
 }
