@@ -49,6 +49,10 @@ const (
 	LBRACE = "{"
 	// RBRACE Delimiter
 	RBRACE = "}"
+	// LBRACKET Delimiter
+	LBRACKET = "["
+	// RBRACKET Delimiter
+	RBRACKET = "]"
 	// LT Delimiter
 	LT = "<"
 	// GT Delimiter

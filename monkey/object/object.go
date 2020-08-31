@@ -19,15 +19,17 @@ const (
 	// NULL_OBJ const
 	NULL_OBJ = "NULL"
 	// RETURN_VALUE_OBJ const
-	RETURN_VALUE_OBJ = "RETURN_VALUE_OBJ"
+	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	// ERROR_OBJ const
-	ERROR_OBJ = "ERROR_OBJ"
+	ERROR_OBJ = "ERROR"
 	// FUNCTION_OBJ const
-	FUNCTION_OBJ = "FUNCTION_OBJ"
+	FUNCTION_OBJ = "FUNCTION"
 	// STRING_OBJ const
 	STRING_OBJ = "STRING"
 	// BUILTIN_OBJ const
 	BUILTIN_OBJ = "BUILTIN"
+	// ARRAY_OBJ const
+	ARRAY_OBJ = "ARRAY"
 )
 
 // Object interface
@@ -170,4 +172,30 @@ func (b *Builtin) Type() ObjectType {
 // Inspect interface method
 func (b *Builtin) Inspect() string {
 	return "builtin function"
+}
+
+// Array struct
+type Array struct {
+	Elements []Object
+}
+
+// Type interface method
+func (ao *Array) Type() ObjectType {
+	return ARRAY_OBJ
+}
+
+// Inspect interface method
+func (ao *Array) Inspect() string {
+	var out bytes.Buffer
+	elements := []string{}
+
+	for _, e := range ao.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
 }
