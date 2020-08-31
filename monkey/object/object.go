@@ -25,7 +25,9 @@ const (
 	// FUNCTION_OBJ const
 	FUNCTION_OBJ = "FUNCTION_OBJ"
 	// STRING_OBJ const
-	STRING = "STRING"
+	STRING_OBJ = "STRING"
+	// BUILTIN_OBJ const
+	BUILTIN_OBJ = "BUILTIN"
 )
 
 // Object interface
@@ -144,10 +146,28 @@ type String struct {
 
 // Type interface method
 func (s *String) Type() ObjectType {
-	return STRING
+	return STRING_OBJ
 }
 
 // Inspect interface method
 func (s *String) Inspect() string {
 	return s.Value
+}
+
+// BuiltinFunction type
+type BuiltinFunction func(args ...Object) Object
+
+// Builtin struct
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+// Type interface method
+func (b *Builtin) Type() ObjectType {
+	return BUILTIN_OBJ
+}
+
+// Inspect interface method
+func (b *Builtin) Inspect() string {
+	return "builtin function"
 }
