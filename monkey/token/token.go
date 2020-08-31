@@ -39,6 +39,8 @@ const (
 	BANG = "!"
 	// COMMA Delimiters
 	COMMA = ","
+	// COLON Delimiters
+	COLON = ":"
 	// SEMICOLON Delimiter
 	SEMICOLON = ";"
 	// LPAREN Delimiter
