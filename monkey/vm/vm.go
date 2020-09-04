@@ -20,6 +20,9 @@ var False = &object.Boolean{Value: false}
 // Null var
 var Null = &object.Null{}
 
+// GlobalSize const
+const GlobalSize = 65536
+
 // VM struct
 type VM struct {
 	constants    []object.Object
@@ -27,7 +30,8 @@ type VM struct {
 	stack        []object.Object
 	// always points to next value.
 	// Top of stack is stack[sp-1].
-	sp int
+	sp      int
+	globals []object.Object
 }
 
 // New func
@@ -37,7 +41,18 @@ func New(bytecode *compiler.Bytecode) *VM {
 		constants:    bytecode.Constants,
 		stack:        make([]object.Object, StackSize),
 		sp:           0,
+		globals:      make([]object.Object, GlobalSize),
 	}
+}
+
+// NewWithGlobalsStore func
+func NewWithGlobalsStore(
+	bytecode *compiler.Bytecode,
+	s []object.Object,
+) *VM {
+	vm := New(bytecode)
+	vm.globals = s
+	return vm
 }
 
 // LastPoppedStackElem func
@@ -117,6 +132,22 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.OpSetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+			vm.globals[globalIndex] = vm.pop()
+
+		case code.OpGetGlobal:
+			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			ip += 2
+
+			err := vm.push(vm.globals[globalIndex])
+
+			if err != nil {
+				return err
+			}
+
 		}
 	}
 	return nil
