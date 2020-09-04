@@ -17,6 +17,9 @@ var True = &object.Boolean{Value: true}
 // False var
 var False = &object.Boolean{Value: false}
 
+// Null var
+var Null = &object.Null{}
+
 // VM struct
 type VM struct {
 	constants    []object.Object
@@ -46,17 +49,19 @@ func (vm *VM) LastPoppedStackElem() object.Object {
 func (vm *VM) Run() error {
 	for ip := 0; ip < len(vm.instructions); ip++ {
 		op := code.Opcode(vm.instructions[ip])
-		switch op {
-		case code.OpPop:
-			vm.pop()
 
+		switch op {
 		case code.OpConstant:
 			constIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2
+
 			err := vm.push(vm.constants[constIndex])
 			if err != nil {
 				return err
 			}
+
+		case code.OpPop:
+			vm.pop()
 
 		case code.OpAdd, code.OpSub, code.OpMul, code.OpDiv:
 			err := vm.executeBinaryOperation(op)
@@ -93,82 +98,43 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.OpJump:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip = pos - 1
+
+		case code.OpJumpNotTruthy:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				ip = pos - 1
+			}
+
+		case code.OpNull:
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
 }
 
-func (vm *VM) executeMinusOperator(op code.Opcode) error {
-	operand := vm.pop()
-
-	if operand.Type() != object.INTEGER_OBJ {
-		return fmt.Errorf("unsupported type for negation: %s",
-			operand.Type())
+func (vm *VM) push(o object.Object) error {
+	if vm.sp >= StackSize {
+		return fmt.Errorf("stack overflow")
 	}
-	value := operand.(*object.Integer).Value
-	return vm.push(&object.Integer{Value: -value})
-
+	vm.stack[vm.sp] = o
+	vm.sp++
+	return nil
 }
 
-func (vm *VM) executeBangOperator(op code.Opcode) error {
-	operand := vm.pop()
-
-	switch operand {
-	case True:
-		return vm.push(False)
-	case False:
-		return vm.push(True)
-	default:
-		return vm.push(False)
-	}
-}
-
-func (vm *VM) executeComparison(op code.Opcode) error {
-	right := vm.pop()
-	left := vm.pop()
-	leftType := left.Type()
-	rightType := right.Type()
-	if leftType == object.INTEGER_OBJ && rightType == object.INTEGER_OBJ {
-		return vm.executeIntegerComparison(op, left, right)
-	}
-	if leftType != object.BOOLEAN_OBJ || rightType != object.BOOLEAN_OBJ {
-		return fmt.Errorf("unsupported types for binary operation: %s %s",
-			leftType, rightType)
-	}
-	switch op {
-	case code.OpEqual:
-		return vm.push(vm.nativeBoolToBooleanObject(right == left))
-	case code.OpNotEqual:
-		return vm.push(vm.nativeBoolToBooleanObject(right != left))
-	default:
-		return fmt.Errorf("unknown operator: %d (%s %s)",
-			op, leftType, rightType)
-	}
-}
-
-func (vm *VM) executeIntegerComparison(
-	op code.Opcode,
-	left, right object.Object,
-) error {
-	leftValue := left.(*object.Integer).Value
-	rightValue := right.(*object.Integer).Value
-
-	switch op {
-	case code.OpEqual:
-		return vm.push(vm.nativeBoolToBooleanObject(leftValue == rightValue))
-	case code.OpNotEqual:
-		return vm.push(vm.nativeBoolToBooleanObject(leftValue != rightValue))
-	case code.OpGreaterThan:
-		return vm.push(vm.nativeBoolToBooleanObject(leftValue > rightValue))
-	default:
-		return fmt.Errorf("unknown operator: %d", op)
-	}
-}
-func (vm *VM) nativeBoolToBooleanObject(input bool) *object.Boolean {
-	if input {
-		return True
-	}
-	return False
+func (vm *VM) pop() object.Object {
+	o := vm.stack[vm.sp-1]
+	vm.sp--
+	return o
 }
 
 func (vm *VM) executeBinaryOperation(op code.Opcode) error {
@@ -205,17 +171,88 @@ func (vm *VM) executeBinaryIntegerOperation(
 	return vm.push(&object.Integer{Value: result})
 }
 
-func (vm *VM) push(o object.Object) error {
-	if vm.sp >= StackSize {
-		return fmt.Errorf("stack overflow")
+func (vm *VM) executeComparison(op code.Opcode) error {
+	right := vm.pop()
+	left := vm.pop()
+
+	if left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ {
+		return vm.executeIntegerComparison(op, left, right)
 	}
-	vm.stack[vm.sp] = o
-	vm.sp++
-	return nil
+
+	switch op {
+	case code.OpEqual:
+		return vm.push(vm.nativeBoolToBooleanObject(right == left))
+	case code.OpNotEqual:
+		return vm.push(vm.nativeBoolToBooleanObject(right != left))
+	default:
+		return fmt.Errorf("unknown operator: %d (%s %s)",
+			op, left.Type(), right.Type())
+	}
 }
 
-func (vm *VM) pop() object.Object {
-	o := vm.stack[vm.sp-1]
-	vm.sp--
-	return o
+func (vm *VM) executeIntegerComparison(
+	op code.Opcode,
+	left, right object.Object,
+) error {
+	leftValue := left.(*object.Integer).Value
+	rightValue := right.(*object.Integer).Value
+
+	switch op {
+	case code.OpEqual:
+		return vm.push(vm.nativeBoolToBooleanObject(leftValue == rightValue))
+	case code.OpNotEqual:
+		return vm.push(vm.nativeBoolToBooleanObject(leftValue != rightValue))
+	case code.OpGreaterThan:
+		return vm.push(vm.nativeBoolToBooleanObject(leftValue > rightValue))
+	default:
+		return fmt.Errorf("unknown operator: %d", op)
+	}
+}
+
+func (vm *VM) executeBangOperator(op code.Opcode) error {
+	operand := vm.pop()
+
+	switch operand {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	case Null:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
+}
+
+func (vm *VM) executeMinusOperator(op code.Opcode) error {
+	operand := vm.pop()
+
+	if operand.Type() != object.INTEGER_OBJ {
+		return fmt.Errorf("unsupported type for negation: %s",
+			operand.Type())
+	}
+	value := operand.(*object.Integer).Value
+	return vm.push(&object.Integer{Value: -value})
+
+}
+
+func (vm *VM) nativeBoolToBooleanObject(input bool) *object.Boolean {
+	if input {
+		return True
+	}
+	return False
+}
+
+func isTruthy(obj object.Object) bool {
+	switch obj := obj.(type) {
+
+	case *object.Boolean:
+		return obj.Value
+
+	case *object.Null:
+		return false
+
+	default:
+		return true
+	}
 }
