@@ -47,6 +47,9 @@ func (vm *VM) Run() error {
 	for ip := 0; ip < len(vm.instructions); ip++ {
 		op := code.Opcode(vm.instructions[ip])
 		switch op {
+		case code.OpPop:
+			vm.pop()
+
 		case code.OpConstant:
 			constIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2
@@ -79,12 +82,45 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-		case code.OpPop:
-			vm.pop()
+		case code.OpBang:
+			err := vm.executeBangOperator(op)
+			if err != nil {
+				return err
+			}
 
+		case code.OpMinus:
+			err := vm.executeMinusOperator(op)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
+}
+
+func (vm *VM) executeMinusOperator(op code.Opcode) error {
+	operand := vm.pop()
+
+	if operand.Type() != object.INTEGER_OBJ {
+		return fmt.Errorf("unsupported type for negation: %s",
+			operand.Type())
+	}
+	value := operand.(*object.Integer).Value
+	return vm.push(&object.Integer{Value: -value})
+
+}
+
+func (vm *VM) executeBangOperator(op code.Opcode) error {
+	operand := vm.pop()
+
+	switch operand {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
 }
 
 func (vm *VM) executeComparison(op code.Opcode) error {
