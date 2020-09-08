@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"monkey/ast"
+	"monkey/code"
 	"strings"
 )
 
@@ -33,6 +34,8 @@ const (
 	ARRAY_OBJ = "ARRAY"
 	// HASH_OBJ const
 	HASH_OBJ = "HASH"
+	// COMPILED_FUNCTION_OBJ const
+	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 )
 
 // Object interface
@@ -265,4 +268,19 @@ func (s *String) HashKey() HashKey {
 	h := fnv.New64a()
 	h.Write([]byte(s.Value))
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
+}
+
+// CompiledFunction struct
+type CompiledFunction struct {
+	Instructions code.Instructions
+}
+
+// Type func
+func (cf *CompiledFunction) Type() ObjectType {
+	return COMPILED_FUNCTION_OBJ
+}
+
+// Inspect func
+func (cf *CompiledFunction) Inspect() string {
+	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }
