@@ -273,6 +273,7 @@ func (s *String) HashKey() HashKey {
 // CompiledFunction struct
 type CompiledFunction struct {
 	Instructions code.Instructions
+	NumLocals    int
 }
 
 // Type func
