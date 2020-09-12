@@ -51,14 +51,29 @@ This command compiles and runs the main program, which starts an interactive she
 known as the REPL. This accepts statements in the Monkey language and evaluates 
 each line and prints the output to the screen. 
 
+### Build executable and run
+
+To build an executable and then run
+
+    go build -o monkey . && ./monkey
+
+### Example Monkey code
+
 Here are some example statements in Monkey:
 
+    20 + 100;
+    if true {
+        100
+    } else {
+        200
+    }
     let five = 5;
 	let ten = 10;
 	let add = fn(x, y) {
 		x + y;
 	};
 	let result = add(five,ten);
+    result;
 
 # Ideas for improvements
 
@@ -70,6 +85,8 @@ Here are some example statements in Monkey:
 
 # Credits
 
-This implementation was largely based on the excellent book called
-    "Writing an Interpreter in Go" by Thorsten Ball
+This implementation was largely based on the excellent books called:
+
+*    "Writing an Interpreter in Go" by Thorsten Ball
+*    "Writing a Compiler in Go" by Thorsten Ball
 
