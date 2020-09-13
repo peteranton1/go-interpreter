@@ -478,6 +478,139 @@ func TestBuiltinFunctions(t *testing.T) {
 	runVMTests(t, tests)
 }
 
+func TestClosures(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+			let newClosure = fn(a) {
+				fn() { a; };
+			};
+			let closure = newClosure(99);
+			closure();
+			`,
+			expected: 99,
+		},
+		{
+			input: `
+			let newAdder = fn(a, b) {
+				fn(c) { a + b + c };
+			};
+			let adder = newAdder(1, 2);
+			adder(8);
+			`,
+			expected: 11,
+		},
+		{
+			input: `
+			let newAdder = fn(a, b) {
+				let c = a + b;
+				fn(d) { c + d };
+			};
+			let adder = newAdder(1, 2);
+			adder(8);
+			`,
+			expected: 11,
+		},
+		{
+			input: `
+			let newAdderOuter = fn(a, b) {
+				let c = a + b;
+				fn(d) { 
+					let e = d + c;
+					fn(f) { e + f; };
+				};
+			};
+			let newAdderInner = newAdderOuter(1, 2);
+			let adder = newAdderInner(3);
+			adder(8);
+			`,
+			expected: 14,
+		},
+		{
+			input: `
+			let a = 1;
+			let newAdderOuter = fn(b) {
+				fn(c) { 
+					fn(d) { a + b + c + d; };
+				};
+			};
+			let newAdderInner = newAdderOuter(2);
+			let adder = newAdderInner(3);
+			adder(8);
+			`,
+			expected: 14,
+		},
+		{
+			input: `
+			let newClosure = fn(a, b) {
+				let one = fn() { a; };
+				let two = fn() { b; };
+				fn() { 
+					one() + two();
+				};
+			};
+			let closure = newClosure(9, 90);
+			closure();
+			`,
+			expected: 99,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
+func TestRecursiveFunctions(t *testing.T) {
+	tests := []vmTestCase{
+		{
+			input: `
+			let countDown = fn(x) {
+				if (x == 0) {
+					return 0;
+				} else {
+					countDown(x - 1);
+				}
+			};
+			countDown(1);
+			`,
+			expected: 0,
+		},
+		{
+			input: `
+			let countDown = fn(x) {
+				if (x == 0) {
+					return 0;
+				} else {
+					countDown(x - 1);
+				}
+			};
+			let wrapper = fn() {
+				countDown(1);
+			};
+			wrapper();
+			`,
+			expected: 0,
+		},
+		{
+			input: `
+			let wrapper = fn() {
+				let countDown = fn(x) {
+					if (x == 0) {
+						return 0;
+					} else {
+						countDown(x - 1);
+					}
+				};
+				countDown(1);
+			};
+			wrapper();
+			`,
+			expected: 0,
+		},
+	}
+
+	runVMTests(t, tests)
+}
+
 type vmTestCase struct {
 	input    string
 	expected interface{}
@@ -496,6 +629,18 @@ func runVMTests(t *testing.T, tests []vmTestCase) {
 			t.Fatalf("compiler error: %s", err)
 		}
 
+		// // Debug stuff
+		// for i, constant := range comp.Bytecode().Constants {
+		// 	fmt.Printf("CONSTANT %d %p (%T):\n", i, constant, constant)
+		// 	switch constant := constant.(type) {
+		// 	case *object.CompiledFunction:
+		// 		fmt.Printf("   Instructions:\n%s", constant.Instructions)
+		// 	case *object.Integer:
+		// 		fmt.Printf("   Value: %d\n", constant.Value)
+		// 	}
+		// 	fmt.Printf("\n")
+		// }
+
 		vm := New(comp.Bytecode())
 		err = vm.Run()
 		if err != nil {
@@ -505,6 +650,7 @@ func runVMTests(t *testing.T, tests []vmTestCase) {
 		stackElem := vm.LastPoppedStackElem()
 
 		testExpectedObject(t, tt.expected, stackElem, tt.input)
+
 	}
 }
 

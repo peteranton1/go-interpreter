@@ -36,6 +36,8 @@ const (
 	HASH_OBJ = "HASH"
 	// COMPILED_FUNCTION_OBJ const
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
+	// CLOSURE_OBJ const
+	CLOSURE_OBJ = "CLOSURE"
 )
 
 // Object interface
@@ -285,4 +287,20 @@ func (cf *CompiledFunction) Type() ObjectType {
 // Inspect func
 func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
+}
+
+// Closure struct
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+// Type func
+func (c *Closure) Type() ObjectType {
+	return CLOSURE_OBJ
+}
+
+// Inspect func
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
 }

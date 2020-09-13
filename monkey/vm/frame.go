@@ -8,21 +8,22 @@ import (
 
 // Frame struct
 type Frame struct {
-	fn          *object.CompiledFunction
+	cl          *object.Closure
 	ip          int
 	basePointer int
 }
 
 // NewFrame func
-func NewFrame(fn *object.CompiledFunction, basePointer int) *Frame {
-	return &Frame{
-		fn:          fn,
+func NewFrame(cl *object.Closure, basePointer int) *Frame {
+	f := &Frame{
+		cl:          cl,
 		ip:          -1,
 		basePointer: basePointer,
 	}
+	return f
 }
 
 // Instructions func
 func (f *Frame) Instructions() code.Instructions {
-	return f.fn.Instructions
+	return f.cl.Fn.Instructions
 }
