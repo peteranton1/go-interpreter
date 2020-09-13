@@ -75,7 +75,31 @@ Here are some example statements in Monkey:
 	let result = add(five,ten);
     result;
 
-# Ideas for improvements
+### Benchmarks
+
+The code implements both an interpretter and also a compiler with VM. 
+
+To create the benchmark program, issue:
+
+    go build -o fibonacci ./benchmark
+
+To run in interpretted mode, the command is:
+
+    $ ./fibonacci -engine=eval
+    
+    engine=eval, result=9227465, duration=22.557914554s
+   
+To run in compiled mode, the command is:
+
+    $ ./fibonacci -engine=vm
+    
+    engine=vm, result=9227465, duration=5.517457919s
+   
+The results shown were created on an ordinary i5 laptop. 
+Interpretted mode took 23 seconds, Compiled mode took 6 seconds.
+This indicates that the fibonnaci program ran much faster in compiled mode.
+
+### Ideas for improvements
 
 * Add more documentation and functionality to the monkey language
 * Provide more example programs
@@ -83,7 +107,7 @@ Here are some example statements in Monkey:
 * Implement a module system
 * Implementations in languages other than Go
 
-# Credits
+### Credits
 
 This implementation was largely based on the excellent books called:
 
